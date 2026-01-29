@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MNEM // MEMORY ACCESS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --text:#EAF0FF;
+      --muted:rgba(234,240,255,.55);
+      --accent:rgba(120,180,255,.65);
+      --danger:#ff6b6b; /* WARN-ROT */
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(900px 500px at 20% 0%, rgba(120,180,255,.14), transparent 60%),
+        radial-gradient(700px 500px at 90% 10%, rgba(255,120,180,.10), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+
+    body.travel-active .app{
+      filter: blur(8px) brightness(.9);
+      transform: scale(1.02);
+      transition:.4s ease;
+      pointer-events:none;
+    }
+    .app{transition:.4s ease}
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:34px 18px 60px;
+    }
+
+    /* TOP */
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      margin-bottom:22px;
+    }
+
+    .brand{
+  display:flex;
+  align-items:center;
+}
+
+
+    .logo{
+  height:130px;          /* gleiche visuelle Höhe wie Session-Block */
+  width:auto;
+  display:block;
+  opacity: 0.96;
+}
+
+    .title{
+  margin-top:0px;
+  margin-left:40px;
+  font-size:45px;
+  font-weight:700;
+  letter-spacing:.28em;
+  color:var(--text);
+  opacity:.85;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight:600;
+  letter-spacing:.28em;
+}
+
+
+    .kicker{
+      font-size:12px;
+      letter-spacing:.32em;
+      color:var(--muted);
+      text-transform:uppercase;
+    }
+
+    h1{
+      margin:0;
+      font-size:52px;
+      font-weight:950;
+      line-height:1;
+      letter-spacing:.01em;
+    }
+
+    /* USER DROPDOWN (VISUAL ONLY) */
+    .userDrop{
+      border:1px solid var(--border);
+      background:var(--panel);
+      border-radius:20px;
+      padding:16px 18px;
+      backdrop-filter: blur(10px);
+      min-width:260px;
+    }
+
+    .userLabel{
+      font-size:11px;
+      letter-spacing:.34em;
+      color:var(--muted);
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .userButton{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.20);
+      border-radius:16px;
+      padding:16px 16px;
+
+      font-size:22px;
+      font-weight:900;
+      letter-spacing:.04em;
+      color:var(--text);
+      user-select:none;
+    }
+
+    .caret{
+      font-size:20px;
+      color:var(--muted);
+      transform: translateY(-1px);
+    }
+
+    /* MEMORY LIST */
+    .memories{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .card{
+      position:relative;
+      overflow:hidden;
+      min-height:96px;
+      border:1px solid var(--border);
+      border-radius:22px;
+      background:var(--panel);
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      cursor:pointer;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image: var(--bgimg);
+      background-size:cover;
+      background-position:center;
+      opacity:.30;
+      filter: blur(3px) brightness(1.2) saturate(1.3);
+      transform:scale(1.04);
+    }
+
+    .card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg, rgba(7,10,18,.55), rgba(7,10,18,.20));
+    }
+
+    .card > *{position:relative; z-index:1}
+
+    .card.selected{
+      border-color:var(--accent);
+      box-shadow:0 0 0 2px rgba(120,180,255,.15) inset;
+    }
+
+    .card.locked{opacity:.5; cursor:not-allowed}
+
+    .name{
+      font-size:26px;
+      font-weight:950;
+      letter-spacing:.02em;
+    }
+
+    .right{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .usage{
+      font-size:13px;
+      letter-spacing:.2em;
+      color:var(--muted);
+    }
+
+    /* 🔴 KRITISCHER VERBRAUCH */
+    .usage.critical{
+      color:var(--danger);
+      font-weight:900;
+    }
+
+    .status{
+      font-size:12px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      border:1px solid rgba(255,255,255,.12);
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.18);
+      color:var(--muted);
+    }
+
+    /* CONTROLS (START zentriert + größer) */
+    .controls{
+      display:flex;
+      justify-content:center;
+      margin-top:24px;
+    }
+
+    button{
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      border-radius:18px;
+      padding:14px 18px;
+      font-size:16px;
+      cursor:pointer;
+      font-family: "Space Grotesk", sans-serif;
+        font-weight:600;
+        letter-spacing:.18em;
+    }
+
+    /* START größer */
+    button.primary{
+      border-color:var(--accent);
+      font-size:22px;
+      padding:20px 48px;
+      letter-spacing:.18em;
+    }
+
+    button:disabled{opacity:.4}
+
+    /* FULLSCREEN TIMER */
+    .timerOverlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(5,8,14,.55);
+      backdrop-filter: blur(6px);
+      z-index:999;
+    }
+    .timerOverlay.active{display:flex}
+
+    .timerBox{text-align:center}
+    .timerLabel{
+      font-size:14px;
+      letter-spacing:.34em;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+    .timerValue{
+      font-size:170px;
+      font-weight:950;
+      line-height:1;
+    }
+    .timerBar{
+      margin-top:24px;
+      width:60vw;
+      max-width:650px;
+      height:12px;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.2);
+    }
+    .timerFill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(120,180,255,.9), rgba(255,255,255,.9));
+    }
+
+    /* MODAL */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,.6);
+      z-index:1000;
+      padding:18px;
+    }
+    .modalBack.open{display:flex}
+    .modal{
+      background:rgba(10,12,18,.92);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      padding:18px;
+      width:min(560px,100%);
+      position:relative; /* nötig für absolute Positionierung */
+    }
+
+.modalLogo{
+  position:absolute;
+  top:25px;
+  right:25px;
+  height: 50px;
+  width:auto;
+  opacity:0.9;
+}
+
+    .modal h3{margin:0; font-size:22px; font-weight:950}
+    .modal p{color:var(--muted); margin-top:10px}
+    .check{display:flex; gap:10px; margin-top:14px; color:var(--muted)}
+    .btns{display:flex; justify-content:flex-end; gap:12px; margin-top:16px}
+    input{accent-color:#78B4FF}
+
+    .modal .lastWarning{
+      margin-top:12px;
+      font-size:22px;
+      text-transform:uppercase;
+      color:#ff6b6b;
+      line-height:1.25;
+      font-family: "Space Grotesk", sans-serif;
+  font-weight:700;
+  letter-spacing:.12em;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="wrap">
+
+    <div class="top">
+        <div class="brand">
+            <img src="images/mnema-logo.png" alt="MNEMA" class="logo">
+            <div class="title">RE-MIND</div>
+          </div>            
+
+      <div class="userDrop" aria-hidden="true">
+        <div class="userLabel">SESSION</div>
+        <div class="userButton">
+          <span>LARA</span>
+          <span class="caret">▾</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="memories" id="memoryGrid"></div>
+
+    <div class="controls">
+      <button class="primary" id="startBtn" disabled>START</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TIMER -->
+<div class="timerOverlay" id="timerOverlay">
+  <div class="timerBox">
+    <div class="timerLabel">TRAVEL ACTIVE</div>
+    <div class="timerValue" id="timerValue">60</div>
+    <div class="timerBar"><div class="timerFill" id="timerFill"></div></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modalBack" id="modalBack">
+  <div class="modal">
+    <img src="images/mnema-logo.png" alt="MNEMA" class="modalLogo">
+    <h3>CAUTION</h3>
+    <p></p>
+    <p class="lastWarning">THIS IS YOUR LAST RE-VISIT!</p>
+    <p>Enjoy your travel and return safely.</p>
+    <label class="check">
+      <input type="checkbox" id="ack"> I understand.
+    </label>
+    <div class="btns">
+      <button id="cancel">CANCEL</button>
+      <button class="primary" id="confirm" disabled>PROCEED</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TRAVEL_SECONDS = 60;
+
+  const memories = [
+    { id:"m1", title:"EMILY, 2032", bg:"images/m1.jpg", usage:"1 / 99", critical: true},
+    { id:"m2", title:"ES WAR MAL NACHT, 2029",  bg:"images/m2.jpg", usage:"93 / 99" },
+    { id:"m3", title:"URLAUB MIT FAMILIEN, 2026",    bg:"images/m3.jpg", usage:"97 / 99" },
+    { id:"m4", title:"PAPAS GARTEN, 2020",   bg:"images/m4.jpg", usage:"99 / 99"}
+  ];
+
+  let selectedId=null, remaining=TRAVEL_SECONDS, timer=null;
+
+  const grid=document.getElementById("memoryGrid");
+  const startBtn=document.getElementById("startBtn");
+  const overlay=document.getElementById("timerOverlay");
+  const value=document.getElementById("timerValue");
+  const fill=document.getElementById("timerFill");
+
+  function render(){
+    grid.innerHTML="";
+    memories.forEach(m=>{
+      const c=document.createElement("div");
+      c.className="card"+(m.locked?" locked":"")+(m.id===selectedId?" selected":"");
+      c.style.setProperty("--bgimg",`url("${m.bg}")`);
+
+      c.innerHTML=`
+        <div class="name">${m.title}</div>
+        <div class="right">
+          ${m.usage ? `<div class="usage ${m.critical ? "critical" : ""}">${m.usage}</div>` : ``}
+          <div class="status">${m.locked ? "LOCKED" : "READY"}</div>
+        </div>
+      `;
+
+      c.onclick=()=>{
+        if(m.locked) return;
+        selectedId=m.id;
+        startBtn.disabled=false;
+        render();
+      };
+
+      grid.appendChild(c);
+    });
+  }
+
+  // Modal
+  const modalBack=document.getElementById("modalBack");
+  const ack=document.getElementById("ack");
+  const confirm=document.getElementById("confirm");
+  const cancel=document.getElementById("cancel");
+
+  startBtn.onclick=()=>modalBack.classList.add("open");
+  ack.onchange=()=>confirm.disabled=!ack.checked;
+  cancel.onclick=()=>modalBack.classList.remove("open");
+  modalBack.onclick=e=>{ if(e.target===modalBack) modalBack.classList.remove("open"); };
+
+  confirm.onclick=()=>{
+    modalBack.classList.remove("open");
+    startTravel();
+  };
+
+  function startTravel(){
+    document.body.classList.add("travel-active");
+    overlay.classList.add("active");
+    remaining=TRAVEL_SECONDS;
+    tick();
+    timer=setInterval(tick,1000);
+  }
+
+  function tick(){
+    value.textContent=remaining;
+    fill.style.width=`${100*(1-remaining/TRAVEL_SECONDS)}%`;
+    if(remaining--<=0) endTravel();
+  }
+
+  function endTravel(){
+    clearInterval(timer);
+    overlay.classList.remove("active");
+    document.body.classList.remove("travel-active");
+  }
+
+  render();
+</script>
+
+</body>
+</html>
