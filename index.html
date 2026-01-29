@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <style>
     :root{
       --bg:#070A12;
@@ -56,45 +56,26 @@
     }
 
     .brand{
-  display:flex;
-  align-items:center;
-}
-
-
-    .logo{
-  height:130px;          /* gleiche visuelle Höhe wie Session-Block */
-  width:auto;
-  display:block;
-  opacity: 0.96;
-}
-
-    .title{
-  margin-top:0px;
-  margin-left:40px;
-  font-size:45px;
-  font-weight:700;
-  letter-spacing:.28em;
-  color:var(--text);
-  opacity:.85;
-  font-family: "Space Grotesk", sans-serif;
-  font-weight:600;
-  letter-spacing:.28em;
-}
-
-
-    .kicker{
-      font-size:12px;
-      letter-spacing:.32em;
-      color:var(--muted);
-      text-transform:uppercase;
+      display:flex;
+      align-items:center;
     }
 
-    h1{
-      margin:0;
-      font-size:52px;
-      font-weight:950;
-      line-height:1;
-      letter-spacing:.01em;
+    .logo{
+      height:130px;
+      width:auto;
+      display:block;
+      opacity: 0.96;
+    }
+
+    .title{
+      margin-top:0px;
+      margin-left:40px;
+      font-size:45px;
+      font-weight:600;
+      letter-spacing:.28em;
+      color:var(--text);
+      opacity:.85;
+      font-family: "Space Grotesk", sans-serif;
     }
 
     /* USER DROPDOWN (VISUAL ONLY) */
@@ -207,7 +188,6 @@
       color:var(--muted);
     }
 
-    /* 🔴 KRITISCHER VERBRAUCH */
     .usage.critical{
       color:var(--danger);
       font-weight:900;
@@ -240,11 +220,10 @@
       font-size:16px;
       cursor:pointer;
       font-family: "Space Grotesk", sans-serif;
-        font-weight:600;
-        letter-spacing:.18em;
+      font-weight:600;
+      letter-spacing:.18em;
     }
 
-    /* START größer */
     button.primary{
       border-color:var(--accent);
       font-size:22px;
@@ -268,17 +247,23 @@
     .timerOverlay.active{display:flex}
 
     .timerBox{text-align:center}
+
     .timerLabel{
       font-size:45px;
       letter-spacing:.34em;
       color:var(--muted);
       margin-bottom:12px;
+      text-transform:uppercase;
     }
+
     .timerValue{
       font-size:170px;
       font-weight:950;
       line-height:1;
+      color:var(--text); /* default (vor den letzten 10s) */
+      transition: color .25s ease;
     }
+
     .timerBar{
       margin-top:24px;
       width:60vw;
@@ -288,10 +273,33 @@
       overflow:hidden;
       border:1px solid rgba(255,255,255,.2);
     }
+
     .timerFill{
       height:100%;
       width:0%;
       background:linear-gradient(90deg, rgba(120,180,255,.9), rgba(255,255,255,.9));
+      transition: background .25s ease;
+    }
+
+    /* 10 Sekunden vor Ende: Timer + Bar rot */
+    .timerOverlay.critical .timerValue{
+      color:var(--danger);
+    }
+    .timerOverlay.critical .timerFill{
+      background:linear-gradient(90deg, rgba(255,107,107,.95), rgba(255,255,255,.85));
+    }
+
+    /* Ende: Label rot + bleibt als Warning sichtbar */
+    .timerOverlay.ended .timerLabel{
+      color:var(--danger);
+      font-weight:700;
+      letter-spacing:.18em;
+    }
+    .timerOverlay.ended .timerValue{
+      color:var(--danger);
+    }
+    .timerOverlay.ended .timerFill{
+      background:linear-gradient(90deg, rgba(255,107,107,.95), rgba(255,107,107,.95));
     }
 
     /* MODAL */
@@ -306,23 +314,24 @@
       padding:18px;
     }
     .modalBack.open{display:flex}
+
     .modal{
       background:rgba(10,12,18,.92);
       border:1px solid rgba(255,255,255,.12);
       border-radius:22px;
       padding:18px;
       width:min(560px,100%);
-      position:relative; /* nötig für absolute Positionierung */
+      position:relative;
     }
 
-.modalLogo{
-  position:absolute;
-  top:25px;
-  right:25px;
-  height: 50px;
-  width:auto;
-  opacity:0.9;
-}
+    .modalLogo{
+      position:absolute;
+      top:25px;
+      right:25px;
+      height:50px;
+      width:auto;
+      opacity:0.9;
+    }
 
     .modal h3{margin:0; font-size:22px; font-weight:950}
     .modal p{color:var(--muted); margin-top:10px}
@@ -334,13 +343,12 @@
       margin-top:12px;
       font-size:22px;
       text-transform:uppercase;
-      color:#ff6b6b;
+      color:var(--danger);
       line-height:1.25;
       font-family: "Space Grotesk", sans-serif;
-  font-weight:700;
-  letter-spacing:.12em;
+      font-weight:700;
+      letter-spacing:.12em;
     }
-
   </style>
 </head>
 
@@ -350,10 +358,10 @@
   <div class="wrap">
 
     <div class="top">
-        <div class="brand">
-            <img src="images/mnema-logo.png" alt="MNEMA" class="logo">
-            <div class="title">RE-MIND</div>
-          </div>            
+      <div class="brand">
+        <img src="images/mnema-logo.png" alt="MNEMA" class="logo">
+        <div class="title">RE-MIND</div>
+      </div>
 
       <div class="userDrop" aria-hidden="true">
         <div class="userLabel">SESSION</div>
@@ -376,7 +384,7 @@
 <!-- TIMER -->
 <div class="timerOverlay" id="timerOverlay">
   <div class="timerBox">
-    <div class="timerLabel">RE-VISIT ACTIVE</div>
+    <div class="timerLabel" id="timerLabel">RE-VISIT ACTIVE</div>
     <div class="timerValue" id="timerValue">60</div>
     <div class="timerBar"><div class="timerFill" id="timerFill"></div></div>
   </div>
@@ -402,6 +410,7 @@
 
 <script>
   const TRAVEL_SECONDS = 60;
+  const CRITICAL_AT = 10; // 10 Sekunden vor Ende
 
   const memories = [
     { id:"m1", title:"EMILY, 2032", bg:"images/m1.jpg", usage:"1 / 99", critical: true},
@@ -415,6 +424,7 @@
   const grid=document.getElementById("memoryGrid");
   const startBtn=document.getElementById("startBtn");
   const overlay=document.getElementById("timerOverlay");
+  const label=document.getElementById("timerLabel");
   const value=document.getElementById("timerValue");
   const fill=document.getElementById("timerFill");
 
@@ -462,22 +472,46 @@
 
   function startTravel(){
     document.body.classList.add("travel-active");
+
+    // Overlay clean reset
+    overlay.classList.remove("critical","ended");
+    label.textContent = "RE-VISIT ACTIVE";
+    remaining = TRAVEL_SECONDS;
+
     overlay.classList.add("active");
-    remaining=TRAVEL_SECONDS;
     tick();
     timer=setInterval(tick,1000);
   }
 
   function tick(){
-    value.textContent=remaining;
-    fill.style.width=`${100*(1-remaining/TRAVEL_SECONDS)}%`;
-    if(remaining--<=0) endTravel();
+    // 10 Sekunden vorher: rot schalten (Timer + Leiste)
+    if(remaining <= CRITICAL_AT && remaining > 0){
+      overlay.classList.add("critical");
+    }else{
+      overlay.classList.remove("critical");
+    }
+
+    value.textContent = remaining;
+    fill.style.width = `${100*(1-remaining/TRAVEL_SECONDS)}%`;
+
+    if(remaining-- <= 0){
+      endTravel();
+    }
   }
 
   function endTravel(){
     clearInterval(timer);
-    overlay.classList.remove("active");
-    document.body.classList.remove("travel-active");
+
+    // Overlay bleibt! (nicht mehr ausblenden)
+    // Blur bleibt! (travel-active bleibt gesetzt)
+
+    overlay.classList.add("ended");
+    overlay.classList.add("critical"); // damit Zahl/Leiste sicher rot bleiben
+
+    label.textContent = "WARNING! USER DID NOT RETURN!";
+    remaining = 0;
+    value.textContent = "0";
+    fill.style.width = "100%";
   }
 
   render();
