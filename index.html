@@ -256,6 +256,30 @@
       text-transform:uppercase;
     }
 
+    .timerOverlay.ended .timerLabel{
+  font-size:56px;      /* deutlich größer */
+  font-weight:700;
+}
+
+@keyframes pulseWarning {
+  0%   { opacity:1;   transform:scale(1); }
+  50%  { opacity:.75; transform:scale(1.015); }
+  100% { opacity:1;   transform:scale(1); }
+}
+
+.timerOverlay.ended .timerLabel{
+  animation: pulseWarning 1.8s ease-in-out infinite;
+}
+
+.timerOverlay.ended .timerValue{
+  animation: pulseWarning 1.6s ease-in-out infinite;
+}
+
+.timerOverlay.ended .timerBar{
+  animation: pulseWarning 2.2s ease-in-out infinite;
+}
+
+
     .timerValue{
       font-size:170px;
       font-weight:950;
