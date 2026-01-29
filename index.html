@@ -16,7 +16,7 @@
       --text:#EAF0FF;
       --muted:rgba(234,240,255,.55);
       --accent:rgba(120,180,255,.65);
-      --danger:#ff6b6b; /* WARN-ROT */
+      --danger:#ff0000; /* WARN-ROT */
     }
 
     *{box-sizing:border-box}
@@ -301,6 +301,11 @@
     .timerOverlay.ended .timerFill{
       background:linear-gradient(90deg, rgba(255,107,107,.95), rgba(255,107,107,.95));
     }
+
+    .timerOverlay.ended .timerBar{
+  border-color: var(--danger);
+}
+
 
     /* MODAL */
     .modalBack{
