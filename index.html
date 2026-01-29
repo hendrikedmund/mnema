@@ -254,56 +254,33 @@
       color:var(--muted);
       margin-bottom:12px;
       text-transform:uppercase;
+      transition: color .25s ease;
     }
-
-    .timerOverlay.ended .timerLabel{
-  font-size:56px;      /* deutlich größer */
-  font-weight:700;
-}
-
-@keyframes pulseWarning {
-  0%   { opacity:1;   transform:scale(1); }
-  50%  { opacity:.75; transform:scale(1.015); }
-  100% { opacity:1;   transform:scale(1); }
-}
-
-.timerOverlay.ended .timerLabel{
-  animation: pulseWarning 1.8s ease-in-out infinite;
-}
-
-.timerOverlay.ended .timerValue{
-  animation: pulseWarning 1.6s ease-in-out infinite;
-}
-
-.timerOverlay.ended .timerBar{
-  animation: pulseWarning 2.2s ease-in-out infinite;
-}
-
 
     .timerValue{
       font-size:170px;
       font-weight:950;
       line-height:1;
-      color:var(--text); /* default (vor den letzten 10s) */
+      color:var(--text);
       transition: color .25s ease;
     }
 
     .timerBar{
-  margin: 24px auto 0 auto;
-  width:60vw;
-  max-width:650px;
-  height:12px;
-  border-radius:999px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.2);
-}
-
+      margin: 24px auto 0 auto;
+      width:60vw;
+      max-width:650px;
+      height:12px;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.2);
+      transition: border-color .25s ease;
+    }
 
     .timerFill{
       height:100%;
       width:0%;
       background:linear-gradient(90deg, rgba(120,180,255,.9), rgba(255,255,255,.9));
-      transition: background .25s ease;
+      transition: background .25s ease, filter .25s ease;
     }
 
     /* 10 Sekunden vor Ende: Timer + Bar rot */
@@ -311,24 +288,79 @@
       color:var(--danger);
     }
     .timerOverlay.critical .timerFill{
-      background:linear-gradient(90deg, rgba(255,107,107,.95), rgba(255,255,255,.85));
+      background:linear-gradient(90deg, var(--danger), rgba(255,255,255,.85));
     }
 
-    /* Ende: Label rot + bleibt als Warning sichtbar */
+    /* ===== ENDZUSTAND: SOFT PULSE + GLOW (nur bei .ended) ===== */
+    @keyframes endedGlowLabel {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 0 rgba(255,0,0,0);
+      }
+      50% {
+        opacity: .92;
+        transform: scale(1.012);
+        text-shadow:
+          0 0 12px rgba(255,0,0,.35),
+          0 0 34px rgba(255,0,0,.18);
+      }
+    }
+
+    @keyframes endedGlowValue {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 0 rgba(255,0,0,0);
+      }
+      50% {
+        opacity: .95;
+        transform: scale(1.02);
+        text-shadow:
+          0 0 22px rgba(255,0,0,.42),
+          0 0 54px rgba(255,0,0,.22);
+      }
+    }
+
+    @keyframes endedGlowBar {
+      0%, 100% {
+        transform: scaleX(1);
+        box-shadow: 0 0 0 rgba(255,0,0,0);
+      }
+      50% {
+        transform: scaleX(1.01);
+        box-shadow:
+          0 0 18px rgba(255,0,0,.24),
+          0 0 44px rgba(255,0,0,.14);
+      }
+    }
+
+    /* Ende: Label rot + größer + glow/pulse */
     .timerOverlay.ended .timerLabel{
       color:var(--danger);
       font-weight:700;
       letter-spacing:.18em;
+      font-size:56px; /* größer als RE-VISIT ACTIVE */
+      animation: endedGlowLabel 2.8s ease-in-out infinite;
     }
+
+    /* Ende: Zahl rot + glow/pulse */
     .timerOverlay.ended .timerValue{
       color:var(--danger);
+      animation: endedGlowValue 2.4s ease-in-out infinite;
     }
+
+    /* Ende: Leiste zentriert bleibt zentriert, bekommt glow/pulse */
+    .timerOverlay.ended .timerBar{
+      border-color: var(--danger);
+      animation: endedGlowBar 3.2s ease-in-out infinite;
+    }
+
+    /* Ende: Fill bleibt rot + leichte Emission */
     .timerOverlay.ended .timerFill{
-      background:linear-gradient(90deg, rgba(255,107,107,.95), rgba(255,107,107,.95));
+      background: linear-gradient(90deg, var(--danger), var(--danger));
+      filter: drop-shadow(0 0 14px rgba(255,0,0,.30));
     }
-
-  
-
 
     /* MODAL */
     .modalBack{
@@ -394,7 +426,7 @@
       <div class="userDrop" aria-hidden="true">
         <div class="userLabel">SESSION</div>
         <div class="userButton">
-          <span>LARA</span>
+          <span>HANNA</span>
           <span class="caret">▾</span>
         </div>
       </div>
@@ -530,11 +562,8 @@
   function endTravel(){
     clearInterval(timer);
 
-    // Overlay bleibt! (nicht mehr ausblenden)
-    // Blur bleibt! (travel-active bleibt gesetzt)
-
     overlay.classList.add("ended");
-    overlay.classList.add("critical"); // damit Zahl/Leiste sicher rot bleiben
+    overlay.classList.add("critical");
 
     label.textContent = "WARNING! USER DID NOT RETURN!";
     remaining = 0;
