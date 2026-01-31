@@ -69,14 +69,30 @@
 
     .title{
       margin-top:0px;
-      margin-left:40px;
-      font-size:45px;
+      font-size:55px;
       font-weight:600;
       letter-spacing:.28em;
       color:var(--text);
       opacity:.85;
       font-family: "Space Grotesk", sans-serif;
     }
+
+    .titles{
+  margin-left:40px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.subtitle{
+  font-size:26px;
+  margin-left:1px;
+  font-weight:500;
+  letter-spacing:.32em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
 
     /* USER DROPDOWN (VISUAL ONLY) */
     .userDrop{
@@ -127,6 +143,110 @@
       gap:12px;
       margin-bottom:16px;
     }
+
+    .moreMemories{
+  margin-top:14px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  border-radius:22px;
+  padding:14px;
+  backdrop-filter: blur(10px);
+}
+
+.moreTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.moreLabel{
+  font-size:11px;
+  letter-spacing:.34em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.moreHint{
+  font-size:11px;
+  letter-spacing:.34em;
+  color:rgba(234,240,255,.35);
+  text-transform:uppercase;
+}
+
+.moreSelect{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.18);
+  border-radius:16px;
+  padding:14px 16px;
+
+  user-select:none;
+}
+
+.moreSelect:hover{
+  border-color: rgba(120,180,255,.35);
+}
+
+.moreMenu{
+  display:none;
+}
+
+
+.moreValue{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:.06em;
+  color:rgba(234,240,255,.85);
+}
+
+.moreCaret{
+  font-size:18px;
+  color:var(--muted);
+  transform: translateY(-1px);
+}
+
+.moreMenu{
+  margin-top:10px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.14);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.moreItem{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+
+  font-size:12px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:rgba(234,240,255,.70);
+}
+
+.moreItem:last-child{border-bottom:none}
+
+.moreItem.disabled{
+  opacity:.45;
+}
+
+.moreTag{
+  font-size:10px;
+  letter-spacing:.28em;
+  border:1px solid rgba(255,255,255,.10);
+  padding:6px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  color:rgba(234,240,255,.55);
+}
+
 
     .card{
       position:relative;
@@ -248,8 +368,23 @@
 
     .timerBox{text-align:center}
 
+    .timerMemory{
+  font-size:58px;
+  letter-spacing:.28em;
+  color:var(--muted);
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+
+.timerUsage{
+  font-size:40px;
+  letter-spacing:.22em;
+  color:var(--muted);
+  margin-bottom:18px;
+}
+
     .timerLabel{
-      font-size:45px;
+      font-size:28px;
       letter-spacing:.34em;
       color:var(--muted);
       margin-bottom:12px;
@@ -335,6 +470,16 @@
       }
     }
 
+    .timerOverlay.ended .timerMemory{
+      font-size: 45px;
+    }
+
+.timerOverlay.ended .timerUsage{
+  font-size: 30px;
+  color:var(--danger);
+  margin-bottom: 30px;
+}
+
     /* Ende: Label rot + größer + glow/pulse */
     .timerOverlay.ended .timerLabel{
       color:var(--danger);
@@ -419,9 +564,13 @@
 
     <div class="top">
       <div class="brand">
-        <img src="images/mnema-logo.png" alt="MNEMA" class="logo">
-        <div class="title">RE-MIND</div>
-      </div>
+  <img src="images/mnema-logo.png" alt="MNEMA" class="logo">
+  <div class="titles">
+    <div class="title">RE-MIND</div>
+    <div class="subtitle">RE-LIVE YOUR MEMORIES</div>
+  </div>
+</div>
+
 
       <div class="userDrop" aria-hidden="true">
         <div class="userLabel">SESSION</div>
@@ -434,9 +583,38 @@
 
     <div class="memories" id="memoryGrid"></div>
 
-    <div class="controls">
-      <button class="primary" id="startBtn" disabled>START</button>
+<!-- Fake dropdown: more memories (visual only) -->
+<div class="moreMemories" aria-hidden="true">
+  <div class="moreTop">
+    <div class="moreLabel">MORE MEMORIES</div>
+    <div class="moreHint">ARCHIVE</div>
+  </div>
+
+  <div class="moreSelect">
+    <div class="moreValue">Select archive…</div>
+    <div class="moreCaret">▾</div>
+  </div>
+
+  <div class="moreMenu">
+    <div class="moreItem">
+      <span>ARCHIVE A</span>
+      <span class="moreTag">AVAILABLE</span>
     </div>
+    <div class="moreItem">
+      <span>ARCHIVE B</span>
+      <span class="moreTag">LIMITED</span>
+    </div>
+    <div class="moreItem disabled">
+      <span>ARCHIVE C</span>
+      <span class="moreTag">LOCKED</span>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="primary" id="startBtn" disabled>START</button>
+</div>
+
 
   </div>
 </div>
@@ -444,7 +622,9 @@
 <!-- TIMER -->
 <div class="timerOverlay" id="timerOverlay">
   <div class="timerBox">
-    <div class="timerLabel" id="timerLabel">RE-VISIT ACTIVE</div>
+    <div class="timerMemory">EMILY, 2032</div>
+    <div class="timerUsage" id="timerUsage">1 / 99</div>
+    <div class="timerLabel" id="timerLabel">RE-LIVE ACTIVE</div>
     <div class="timerValue" id="timerValue">60</div>
     <div class="timerBar"><div class="timerFill" id="timerFill"></div></div>
   </div>
@@ -456,7 +636,7 @@
     <img src="images/mnema-logo.png" alt="MNEMA" class="modalLogo">
     <h3>CAUTION</h3>
     <p></p>
-    <p class="lastWarning">THIS IS YOUR LAST RE-VISIT!</p>
+    <p class="lastWarning">THIS IS YOUR LAST RE-LIVE!</p>
     <p>Enjoy your journey and return in time.</p>
     <label class="check">
       <input type="checkbox" id="ack"> I understand.
@@ -475,7 +655,7 @@
   const memories = [
     { id:"m1", title:"EMILY, 2032", bg:"images/m1.jpg", usage:"1 / 99", critical: true},
     { id:"m2", title:"ES WAR MAL NACHT, 2029",  bg:"images/m2.jpg", usage:"93 / 99" },
-    { id:"m3", title:"URLAUB MIT FAMILIEN, 2026",    bg:"images/m3.jpg", usage:"97 / 99" },
+    { id:"m3", title:"URLAUB MIT FAMILIE, 2026",    bg:"images/m3.jpg", usage:"97 / 99" },
     { id:"m4", title:"PAPAS GARTEN, 2020",   bg:"images/m4.jpg", usage:"99 / 99"}
   ];
 
@@ -487,6 +667,8 @@
   const label=document.getElementById("timerLabel");
   const value=document.getElementById("timerValue");
   const fill=document.getElementById("timerFill");
+  const usage = document.getElementById("timerUsage");
+
 
   function render(){
     grid.innerHTML="";
@@ -541,6 +723,8 @@
     overlay.classList.add("active");
     tick();
     timer=setInterval(tick,1000);
+    usage.textContent = "1 / 99";
+
   }
 
   function tick(){
@@ -569,6 +753,7 @@
     remaining = 0;
     value.textContent = "0";
     fill.style.width = "100%";
+    usage.textContent = "0 / 99";
   }
 
   render();
